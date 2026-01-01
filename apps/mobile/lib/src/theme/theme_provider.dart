@@ -1,86 +1,113 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../core/utils/color_utils.dart';
+import '../experience/models/experience_config.dart';
+import '../experience/providers/experience_providers.dart';
 import 'app_typography.dart';
 import 'tokens.dart';
 
 final themeModeProvider = StateProvider<ThemeMode>((ref) => ThemeMode.light);
 
 final lightThemeProvider =
-    Provider<ThemeData>((ref) => _buildTheme(Brightness.light));
+    Provider<ThemeData>((ref) => _buildTheme(Brightness.light, ref));
 final darkThemeProvider =
-    Provider<ThemeData>((ref) => _buildTheme(Brightness.dark));
+    Provider<ThemeData>((ref) => _buildTheme(Brightness.dark, ref));
 
-ThemeData _buildTheme(Brightness brightness) {
+ThemeData _buildTheme(Brightness brightness, WidgetRef ref) {
+  final override = ref.watch(themeOverrideProvider);
+  final ThemePalette? palette =
+      brightness == Brightness.dark ? override?.dark : override?.light;
+  final resolvedRadius = override?.cornerRadius ?? Radii.card;
+
+  final primary = _resolveColor(palette?.primary, AppColors.brandMint500);
+  final surface = _resolveColor(palette?.surface, AppColors.neutral0);
+  final background =
+      _resolveColor(palette?.background, AppColors.surfaceBase);
+  final textPrimary = _resolveColor(
+      palette?.textPrimary,
+      brightness == Brightness.dark
+          ? AppColors.neutral50
+          : AppColors.brandMint800);
+  final textSecondary =
+      _resolveColor(palette?.textSecondary, AppColors.brandMint600);
+  final accent = _resolveColor(palette?.accent, AppColors.chartSpending);
+  final success = _resolveColor(palette?.success, AppColors.success);
+  final warning = _resolveColor(palette?.warning, AppColors.warning);
+  final error = _resolveColor(palette?.error, AppColors.error);
+
   final colorScheme = ColorScheme(
     brightness: brightness,
-    primary: AppColors.brandMint500,
+    primary: primary,
     onPrimary: Colors.white,
-    primaryContainer: AppColors.brandMint100,
-    onPrimaryContainer: AppColors.brandMint700,
-    secondary: AppColors.brandMint400,
+    primaryContainer: primary.withOpacity(0.1),
+    onPrimaryContainer: textPrimary,
+    secondary: accent,
     onSecondary: Colors.white,
-    secondaryContainer: AppColors.brandMint50,
-    onSecondaryContainer: AppColors.brandMint700,
-    tertiary: const Color(0xFF0ACF83),
+    secondaryContainer: accent.withOpacity(0.12),
+    onSecondaryContainer: textPrimary,
+    tertiary: accent,
     onTertiary: Colors.white,
-    tertiaryContainer: const Color(0xFFB2FADF),
+    tertiaryContainer: accent.withOpacity(0.2),
     onTertiaryContainer: AppColors.brandMint800,
-    error: AppColors.error,
+    error: error,
     onError: Colors.white,
-    errorContainer: const Color(0xFFFEE3E3),
-    onErrorContainer: AppColors.error,
-    background: AppColors.neutral50,
-    onBackground: AppColors.brandMint800,
-    surface: AppColors.neutral0,
-    onSurface: AppColors.brandMint800,
+    errorContainer: error.withOpacity(0.12),
+    onErrorContainer: error,
+    background: background,
+    onBackground: textPrimary,
+    surface: surface,
+    onSurface: textPrimary,
     surfaceVariant: AppColors.brandMint50,
-    onSurfaceVariant: AppColors.brandMint600,
+    onSurfaceVariant: textSecondary,
     outline: AppColors.brandMint200,
     shadow: Colors.black26,
-    inverseSurface: AppColors.brandMint800,
-    onInverseSurface: AppColors.neutral0,
-    inversePrimary: AppColors.brandMint200,
-    surfaceTint: AppColors.brandMint500,
+    inverseSurface: textPrimary,
+    onInverseSurface: background,
+    inversePrimary: primary.withOpacity(0.4),
+    surfaceTint: primary,
   );
 
-  final textTheme = AppTypography.textTheme(brightness);
+  final textTheme = AppTypography.textTheme(brightness).apply(
+        bodyColor: textPrimary,
+        displayColor: textPrimary,
+      );
 
   return ThemeData(
     useMaterial3: true,
     brightness: brightness,
     colorScheme: colorScheme,
     textTheme: textTheme,
-    scaffoldBackgroundColor: AppColors.surfaceBase,
+    scaffoldBackgroundColor: background,
     cardTheme: CardThemeData(
       margin: EdgeInsets.zero,
       elevation: 0,
-      color: AppColors.surfaceCard,
+      color: surface,
       shadowColor: Colors.transparent,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(Radii.card),
+        borderRadius: BorderRadius.circular(resolvedRadius),
       ),
     ),
     appBarTheme: AppBarTheme(
       elevation: 0,
-      backgroundColor: AppColors.surfaceBase,
-      foregroundColor: AppColors.brandMint800,
+      backgroundColor: background,
+      foregroundColor: textPrimary,
       titleTextStyle:
-          textTheme.titleLarge?.copyWith(color: AppColors.brandMint800),
+          textTheme.titleLarge?.copyWith(color: textPrimary),
     ),
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
       fillColor: AppColors.surfaceCardAlt,
       contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(Radii.card),
+        borderRadius: BorderRadius.circular(resolvedRadius),
         borderSide: BorderSide(color: AppColors.brandMint200),
       ),
       focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(Radii.card),
-        borderSide: BorderSide(color: AppColors.brandMint500, width: 1.6),
+        borderRadius: BorderRadius.circular(resolvedRadius),
+        borderSide: BorderSide(color: primary, width: 1.6),
       ),
-      labelStyle: textTheme.bodyMedium?.copyWith(color: AppColors.brandMint700),
+      labelStyle: textTheme.bodyMedium?.copyWith(color: textSecondary),
     ),
     chipTheme: ChipThemeData(
       shape: StadiumBorder(
@@ -94,22 +121,22 @@ ThemeData _buildTheme(Brightness brightness) {
       style: ElevatedButton.styleFrom(
         elevation: 4,
         foregroundColor: Colors.white,
-        backgroundColor: AppColors.brandMint500,
+        backgroundColor: primary,
         padding: const EdgeInsets.symmetric(vertical: 18),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(Radii.button),
+          borderRadius: BorderRadius.circular(resolvedRadius),
         ),
       ),
     ),
     textButtonTheme: TextButtonThemeData(
       style: TextButton.styleFrom(
-        foregroundColor: AppColors.brandMint700,
+        foregroundColor: primary,
         textStyle: textTheme.labelLarge,
       ),
     ),
     navigationBarTheme: NavigationBarThemeData(
-      backgroundColor: AppColors.surfaceCard,
-      indicatorColor: AppColors.brandMint100,
+      backgroundColor: surface,
+      indicatorColor: primary.withOpacity(0.12),
       elevation: 8,
       labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
     ),
@@ -119,3 +146,6 @@ ThemeData _buildTheme(Brightness brightness) {
     ),
   );
 }
+
+Color _resolveColor(String? hex, Color fallback) =>
+    parseHexColor(hex, fallback: fallback);

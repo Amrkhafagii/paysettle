@@ -14,6 +14,8 @@ class ContactsRemoteDataSource {
   Future<List<ContactDto>> fetchContacts({
     required String query,
     required ContactSort sort,
+    required int offset,
+    required int limit,
   }) async {
     try {
       var request = _client
@@ -31,7 +33,7 @@ class ContactsRemoteDataSource {
         ContactSort.recent => request.order('created_at', ascending: false),
       };
 
-      final response = await ordered.limit(100);
+      final response = await ordered.range(offset, offset + limit - 1);
       return response
           .whereType<Map<String, dynamic>>()
           .map(ContactDto.fromMap)

@@ -25,11 +25,28 @@ class ContactsController extends StateNotifier<ContactsState> {
   final DeleteContactUseCase _deleteContact;
 
   Future<void> load() async {
-    state = state.copyWith(contacts: const AsyncValue.loading());
-    final result = await AsyncValue.guard(
-      () => _getContacts(query: state.query, sort: state.sort),
+    state = state.copyWith(
+      contacts: const AsyncValue.loading(),
+      hasMore: true,
+      isLoadingMore: false,
     );
-    state = state.copyWith(contacts: result);
+    final result = await AsyncValue.guard(
+      () => _getContacts(
+        query: state.query,
+        sort: state.sort,
+        offset: 0,
+        limit: state.pageSize,
+      ),
+    );
+    if (result.hasError) {
+      state = state.copyWith(contacts: result, hasMore: false);
+      return;
+    }
+    final data = result.value ?? const [];
+    state = state.copyWith(
+      contacts: AsyncValue.data(data),
+      hasMore: data.length == state.pageSize,
+    );
   }
 
   void updateQuery(String query) {
@@ -50,6 +67,33 @@ class ContactsController extends StateNotifier<ContactsState> {
   Future<void> deleteContact(String contactId) async {
     await _deleteContact(contactId);
     await load();
+  }
+
+  Future<void> loadMore() async {
+    if (state.isLoadingMore || !state.hasMore) {
+      return;
+    }
+    final current = state.contacts.valueOrNull ?? const <Contact>[];
+    state = state.copyWith(isLoadingMore: true);
+    try {
+      final next = await _getContacts(
+        query: state.query,
+        sort: state.sort,
+        offset: current.length,
+        limit: state.pageSize,
+      );
+      final combined = List<Contact>.from(current)..addAll(next);
+      state = state.copyWith(
+        contacts: AsyncValue.data(combined),
+        hasMore: next.length == state.pageSize,
+        isLoadingMore: false,
+      );
+    } catch (_) {
+      state = state.copyWith(
+        contacts: AsyncValue.data(current),
+        isLoadingMore: false,
+      );
+    }
   }
 }
 

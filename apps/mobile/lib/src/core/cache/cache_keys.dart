@@ -8,4 +8,6 @@ class CacheKeys {
   static const String budgetCategories = 'budget_categories_v1';
   static const String insightsDashboard = 'insights_dashboard_v1';
   static const String notificationsFeed = 'notifications_feed_v1';
+  static const String settingsOverview = 'settings_overview_v1';
+  static const String experienceConfig = 'experience_config_v1';
 }

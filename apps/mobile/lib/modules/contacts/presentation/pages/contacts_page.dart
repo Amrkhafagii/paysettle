@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../src/performance/lazy_data_list_view.dart';
 import '../../../../src/theme/tokens.dart';
 import '../../domain/entities/contact.dart';
 import '../../domain/value_objects/contact_sort.dart';
@@ -57,7 +58,7 @@ class ContactsPage extends ConsumerWidget {
             child: state.contacts.when(
               loading: () => const Center(child: CircularProgressIndicator()),
               error: (error, stack) => Center(child: Text(error.toString())),
-              data: (contacts) => ListView.separated(
+              data: (contacts) => LazyDataListView(
                 padding: const EdgeInsets.symmetric(
                     horizontal: Spacing.lg, vertical: Spacing.sm),
                 itemBuilder: (context, index) => _ContactTile(
@@ -66,6 +67,9 @@ class ContactsPage extends ConsumerWidget {
                 ),
                 separatorBuilder: (_, __) => const SizedBox(height: Spacing.sm),
                 itemCount: contacts.length,
+                hasMore: state.hasMore,
+                isLoadingMore: state.isLoadingMore,
+                onEndReached: state.hasMore ? controller.loadMore : null,
               ),
             ),
           ),

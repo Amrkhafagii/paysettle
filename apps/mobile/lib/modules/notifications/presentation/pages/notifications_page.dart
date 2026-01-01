@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../src/experience/providers/experience_providers.dart';
 import '../../../../src/theme/tokens.dart';
 import '../../domain/entities/app_notification.dart';
 import '../controllers/notifications_controller.dart';
@@ -83,7 +84,7 @@ class _NotificationsError extends StatelessWidget {
   }
 }
 
-class _NotificationsList extends StatelessWidget {
+class _NotificationsList extends ConsumerWidget {
   const _NotificationsList({
     required this.feed,
     required this.onMarkAsRead,
@@ -93,12 +94,30 @@ class _NotificationsList extends StatelessWidget {
   final Future<void> Function(String id) onMarkAsRead;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final featureFlags = ref.watch(featureFlagServiceProvider);
+    final showExports = featureFlags.isEnabled('budget_csv_export');
     return ListView(
       physics: const AlwaysScrollableScrollPhysics(),
       padding:
           const EdgeInsets.fromLTRB(Spacing.lg, Spacing.lg, Spacing.lg, 120),
       children: [
+        if (showExports) ...[
+          Card(
+            color: AppColors.surfaceAccent,
+            child: ListTile(
+              leading: const Icon(Icons.file_download_rounded),
+              title: const Text('Export budgets to CSV'),
+              subtitle:
+                  const Text('Enabled via remote flag for staged rollouts.'),
+              trailing: FilledButton(
+                onPressed: () {},
+                child: const Text('Extract'),
+              ),
+            ),
+          ),
+          const SizedBox(height: Spacing.lg),
+        ],
         if (feed.newItems.isNotEmpty) ...[
           Text('New', style: Theme.of(context).textTheme.titleMedium),
           const SizedBox(height: Spacing.sm),

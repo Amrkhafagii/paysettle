@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'config/app_config.dart';
+import 'experience/providers/experience_providers.dart';
 import 'localization/l10n.dart';
 import 'navigation/app_router.dart';
+import 'performance/frame_timings_monitor.dart';
 import 'theme/theme_provider.dart';
 
 class PaySettleApp extends ConsumerWidget {
@@ -16,9 +18,13 @@ class PaySettleApp extends ConsumerWidget {
     final themeMode = ref.watch(themeModeProvider);
     final lightTheme = ref.watch(lightThemeProvider);
     final darkTheme = ref.watch(darkThemeProvider);
+    final flags = ref.watch(featureFlagServiceProvider);
+    ref.watch(frameTimingsMonitorProvider);
 
     return MaterialApp.router(
       debugShowCheckedModeBanner: config.showDebugBanner,
+      showPerformanceOverlay:
+          config.enableLogging && flags.isEnabled('debug_performance_overlay'),
       routerConfig: router,
       themeMode: themeMode,
       theme: lightTheme,

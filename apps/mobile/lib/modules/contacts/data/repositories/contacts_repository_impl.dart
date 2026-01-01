@@ -24,10 +24,17 @@ class ContactsRepositoryImpl implements ContactsRepository {
   Future<List<Contact>> fetchContacts({
     String query = '',
     ContactSort sort = ContactSort.alphabetical,
+    int offset = 0,
+    int limit = 25,
   }) async {
     try {
-      final dtos = await _remoteDataSource.fetchContacts(query: query, sort: sort);
-      if (query.isEmpty) {
+      final dtos = await _remoteDataSource.fetchContacts(
+        query: query,
+        sort: sort,
+        offset: offset,
+        limit: limit,
+      );
+      if (query.isEmpty && offset == 0) {
         await _cacheService.write(
           CacheBox.core,
           _cacheKey,
@@ -40,7 +47,7 @@ class ContactsRepositoryImpl implements ContactsRepository {
     } catch (_) {
       final cached =
           _cacheService.read<List<dynamic>>(CacheBox.core, _cacheKey);
-      if (cached != null && query.isEmpty) {
+      if (cached != null && query.isEmpty && offset == 0) {
         return cached
             .whereType<Map>()
             .map((entry) => ContactDto.fromMap(
@@ -49,10 +56,14 @@ class ContactsRepositoryImpl implements ContactsRepository {
             .toList(growable: false);
       }
     }
-    return _demoContacts
+    final filtered = _demoContacts
         .where((contact) => query.isEmpty
             ? true
             : contact.displayName.toLowerCase().contains(query.toLowerCase()))
+        .toList(growable: false);
+    return filtered
+        .skip(offset)
+        .take(limit)
         .toList(growable: false);
   }
 

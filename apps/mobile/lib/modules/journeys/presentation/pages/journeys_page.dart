@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 
+import '../../../../src/performance/isolated_matrix_builder.dart';
 import '../../../../src/theme/tokens.dart';
 
 class JourneysPage extends ConsumerWidget {
@@ -21,6 +23,8 @@ class JourneysPage extends ConsumerWidget {
           const _JourneySection(title: 'Active'),
           const SizedBox(height: Spacing.lg),
           const _JourneySection(title: 'Past'),
+          const SizedBox(height: Spacing.lg),
+          const _JourneySpendingMatrix(),
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
@@ -111,3 +115,131 @@ class _JourneyCard extends StatelessWidget {
     );
   }
 }
+
+class _JourneySpendingMatrix extends StatefulWidget {
+  const _JourneySpendingMatrix();
+
+  @override
+  State<_JourneySpendingMatrix> createState() => _JourneySpendingMatrixState();
+}
+
+class _JourneySpendingMatrixState extends State<_JourneySpendingMatrix> {
+  late Future<JourneyMatrix> _matrixFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _matrixFuture = IsolatedMatrixBuilder.build(_matrixSampleEntries);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final formatter = NumberFormat.currency(symbol: 'EGP ');
+    return FutureBuilder<JourneyMatrix>(
+      future: _matrixFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState != ConnectionState.done) {
+          return Container(
+            padding: const EdgeInsets.all(Spacing.lg),
+            decoration: BoxDecoration(
+              color: AppColors.surfaceCard,
+              borderRadius: BorderRadius.circular(Radii.card),
+            ),
+            child: const Center(child: CircularProgressIndicator()),
+          );
+        }
+
+        final matrix = snapshot.data;
+        if (matrix == null) {
+          return const SizedBox.shrink();
+        }
+
+        return Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(Radii.card),
+            color: AppColors.surfaceCard,
+            boxShadow: AppShadows.level1,
+          ),
+          padding: const EdgeInsets.all(Spacing.lg),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Journey Spending Matrix',
+                  style: Theme.of(context).textTheme.titleMedium),
+              const SizedBox(height: Spacing.xs),
+              Text('Computed off the main isolate to keep scrolling smooth.',
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodySmall
+                      ?.copyWith(color: AppColors.neutral600)),
+              const SizedBox(height: Spacing.md),
+              Text('Total Spent: ${formatter.format(matrix.total)}',
+                  style: Theme.of(context)
+                      .textTheme
+                      .titleLarge
+                      ?.copyWith(fontWeight: FontWeight.bold)),
+              const SizedBox(height: Spacing.md),
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: DataTable(
+                  headingRowColor: MaterialStatePropertyAll(
+                    AppColors.surfaceCardAlt,
+                  ),
+                  dataRowHeight: 54,
+                  columns: [
+                    const DataColumn(
+                        label: Text('Participant',
+                            style: TextStyle(fontWeight: FontWeight.w600))),
+                    ...matrix.categories.map(
+                      (category) => DataColumn(
+                        label: Text(category.toUpperCase(),
+                            style: const TextStyle(
+                                fontWeight: FontWeight.w600, fontSize: 12)),
+                      ),
+                    ),
+                    const DataColumn(
+                        label: Text('Total',
+                            style: TextStyle(fontWeight: FontWeight.w600))),
+                  ],
+                  rows: matrix.rows
+                      .map(
+                        (row) => DataRow(
+                          cells: [
+                            DataCell(Text(row.participant)),
+                            ...matrix.categories.map(
+                              (category) => DataCell(Text(
+                                row.values[category] == null
+                                    ? '-'
+                                    : formatter.format(
+                                        row.values[category],
+                                      ),
+                              )),
+                            ),
+                            DataCell(Text(formatter.format(row.rowTotal))),
+                          ],
+                        ),
+                      )
+                      .toList(growable: false),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+const _matrixSampleEntries = [
+  {'participant': 'Noha', 'category': 'Accommodation', 'amount': 1200},
+  {'participant': 'Noha', 'category': 'Transport', 'amount': 640},
+  {'participant': 'Ahmed', 'category': 'Accommodation', 'amount': 800},
+  {'participant': 'Ahmed', 'category': 'Food', 'amount': 540},
+  {'participant': 'Tarek', 'category': 'Transport', 'amount': 120},
+  {'participant': 'Tarek', 'category': 'Activities', 'amount': 420},
+  {'participant': 'Hend', 'category': 'Food', 'amount': 300},
+  {'participant': 'Hend', 'category': 'Activities', 'amount': 650},
+  {'participant': 'Seleim', 'category': 'Accommodation', 'amount': 900},
+  {'participant': 'Shawky', 'category': 'Transport', 'amount': 150},
+  {'participant': 'Shawky', 'category': 'Food', 'amount': 80},
+];
