@@ -1,0 +1,22 @@
+name: paysettle
+packages:
+  - apps/**
+  - packages/**
+
+commands:
+  bootstrap:
+    runPubGetInParallel: true
+
+scripts:
+  analyze: melos exec -c 1 -- flutter analyze
+  format: melos exec -- flutter format lib test
+  test: melos exec -c 1 -- flutter test
+  app:dev:
+    run: |
+      cd apps/mobile && flutter run --flavor dev -t lib/main_dev.dart
+  app:stg:
+    run: |
+      cd apps/mobile && flutter run --flavor stg -t lib/main_stg.dart
+  app:prod:
+    run: |
+      cd apps/mobile && flutter run --flavor prod -t lib/main_prod.dart

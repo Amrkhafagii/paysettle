@@ -1,0 +1,24 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: check-added-large-files
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+  - repo: local
+    hooks:
+      - id: flutter-format
+        name: Flutter Format (mobile)
+        entry: bash -c "cd apps/mobile && flutter format --set-exit-if-changed lib test"
+        language: system
+        pass_filenames: false
+      - id: flutter-analyze
+        name: Flutter Analyze (mobile)
+        entry: bash -c "cd apps/mobile && flutter analyze"
+        language: system
+        pass_filenames: false
+      - id: dart-test
+        name: Flutter Test (mobile)
+        entry: bash -c "cd apps/mobile && flutter test --coverage"
+        language: system
+        pass_filenames: false

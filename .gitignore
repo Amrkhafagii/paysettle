@@ -1,0 +1,31 @@
+# Flutter/Dart
+.dart_tool/
+.packages
+.pub-cache/
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+.melos_tool/
+.idea/
+.vscode/
+
+# iOS
+**/Pods/
+**/DerivedData/
+
+# Android
+**/gradle-wrapper.jar
+**/.gradle/
+**/local.properties
+
+# macOS/Linux/Windows
+**/flutter/ephemeral/
+
+# Node / tooling
+node_modules/
+
+# Generated
+*.log
+coverage/
+supabase/.branches/
+.env.deploy

@@ -1,0 +1,9 @@
+name: paysettle_workspace
+description: Workspace tooling for the PaySettle mono-repo.
+publish_to: none
+
+environment:
+  sdk: ">=3.4.0 <4.0.0"
+
+dependencies:
+  melos: ^6.3.2
