@@ -29,3 +29,9 @@ node_modules/
 coverage/
 supabase/.branches/
 .env.deploy
+
+# Local Flutter SDK binaries
+tooling/flutter/
+tooling/flutter_*.zip
+tooling/flutter-macos*.zip
+tooling/flutter_macos*.zip
