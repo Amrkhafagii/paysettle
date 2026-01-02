@@ -353,7 +353,7 @@ class _BudgetCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final percent = (budget.progress / 100).clamp(0, 1);
+    final percent = (budget.progress / 100).clamp(0.0, 1.0).toDouble();
     final indicatorColor = switch (budget.status) {
       BudgetStatus.ok => AppColors.brandMint500,
       BudgetStatus.warning => AppColors.warning,

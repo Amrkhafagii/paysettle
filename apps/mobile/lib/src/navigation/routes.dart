@@ -5,6 +5,8 @@ class AppRoutes {
   static const String walletBudgeting = '/wallet/budgeting';
   static const String walletInsights = '/wallet/insights';
   static const String journeys = '/journeys';
+  static const String journeyDetail = '/journeys/:journeyId';
+  static const String journeyCreate = '/journeys/create';
   static const String contacts = '/contacts';
   static const String alerts = '/alerts';
   static const String settings = '/settings';

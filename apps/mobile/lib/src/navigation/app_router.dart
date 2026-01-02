@@ -21,6 +21,8 @@ import '../navigation/app_shell.dart';
 import '../navigation/routes.dart';
 import '../../modules/auth/presentation/controllers/auth_controller.dart';
 import '../../modules/auth/presentation/state/auth_state.dart';
+import '../../modules/journeys/presentation/pages/journey_detail_page.dart';
+import '../../modules/journeys/presentation/pages/journey_editor_page.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 
@@ -40,6 +42,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       final location = state.matchedLocation;
       final isAuthRoute = location.startsWith('/auth');
       final isOnboardingRoute = location == AppRoutes.onboarding;
+      final isPublicRoute = isAuthRoute || isOnboardingRoute;
 
       if (authState.status == AuthStatus.initializing) {
         return null;
@@ -57,11 +60,11 @@ final routerProvider = Provider<GoRouter>((ref) {
 
       final isAuthenticated = authState.status == AuthStatus.authenticated;
 
-      if (!isAuthenticated && !isAuthRoute) {
+      if (!isAuthenticated && !isPublicRoute) {
         return AppRoutes.authLogin;
       }
 
-      if (isAuthenticated && isAuthRoute) {
+      if (isAuthenticated && (isAuthRoute || isOnboardingRoute)) {
         return AppRoutes.wallet;
       }
 
@@ -115,6 +118,22 @@ final routerProvider = Provider<GoRouter>((ref) {
                 path: AppRoutes.journeys,
                 pageBuilder: (context, state) =>
                     const NoTransitionPage(child: JourneysPage()),
+                routes: [
+                  GoRoute(
+                    path: ':journeyId',
+                    builder: (context, state) {
+                      final rawName =
+                          state.pathParameters['journeyId'] ?? 'Journey';
+                      return JourneyDetailPage(
+                        journeyName: Uri.decodeComponent(rawName),
+                      );
+                    },
+                  ),
+                  GoRoute(
+                    path: 'create',
+                    builder: (context, state) => const JourneyEditorPage(),
+                  ),
+                ],
               ),
             ],
           ),

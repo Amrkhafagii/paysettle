@@ -159,7 +159,8 @@ class __$$AuthSessionDtoImplCopyWithImpl<$Res>
 }
 
 /// @nodoc
-@JsonSerializable()
+
+@JsonSerializable(explicitToJson: true)
 class _$AuthSessionDtoImpl implements _AuthSessionDto {
   const _$AuthSessionDtoImpl(
       {required this.accessToken,

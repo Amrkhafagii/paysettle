@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../src/navigation/routes.dart';
 import '../../../../src/performance/isolated_matrix_builder.dart';
 import '../../../../src/theme/tokens.dart';
 
@@ -28,7 +30,7 @@ class JourneysPage extends ConsumerWidget {
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {},
+        onPressed: () => context.go(AppRoutes.journeyCreate),
         icon: const Icon(Icons.add),
         label: const Text('New Journey'),
       ),
@@ -77,11 +79,27 @@ class _JourneySection extends StatelessWidget {
         Wrap(
           spacing: Spacing.md,
           runSpacing: Spacing.md,
-          children: const [
-            _JourneyCard(name: 'Running Expenses'),
-            _JourneyCard(name: 'Trip / Travel'),
-            _JourneyCard(name: 'Food Order'),
-            _JourneyCard(name: 'Playstation Night'),
+          children: [
+            _JourneyCard(
+              name: 'Running Expenses',
+              onTap: () => context.go(
+                  '${AppRoutes.journeys}/${Uri.encodeComponent('Running Expenses')}'),
+            ),
+            _JourneyCard(
+              name: 'Trip / Travel',
+              onTap: () => context.go(
+                  '${AppRoutes.journeys}/${Uri.encodeComponent('Trip / Travel')}'),
+            ),
+            _JourneyCard(
+              name: 'Food Order',
+              onTap: () => context.go(
+                  '${AppRoutes.journeys}/${Uri.encodeComponent('Food Order')}'),
+            ),
+            _JourneyCard(
+              name: 'Playstation Night',
+              onTap: () => context.go(
+                  '${AppRoutes.journeys}/${Uri.encodeComponent('Playstation Night')}'),
+            ),
           ],
         ),
       ],
@@ -90,27 +108,32 @@ class _JourneySection extends StatelessWidget {
 }
 
 class _JourneyCard extends StatelessWidget {
-  const _JourneyCard({required this.name});
+  const _JourneyCard({required this.name, required this.onTap});
 
   final String name;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 150,
-      height: 110,
-      decoration: BoxDecoration(
-        color: AppColors.neutral0,
-        borderRadius: BorderRadius.circular(Radii.card),
-        boxShadow: const [
-          BoxShadow(
-              color: Colors.black12, blurRadius: 12, offset: Offset(0, 6)),
-        ],
-      ),
-      padding: const EdgeInsets.all(Spacing.md),
-      child: Align(
-        alignment: Alignment.bottomLeft,
-        child: Text(name, style: Theme.of(context).textTheme.titleSmall),
+    return InkWell(
+      borderRadius: BorderRadius.circular(Radii.card),
+      onTap: onTap,
+      child: Container(
+        width: 150,
+        height: 110,
+        decoration: BoxDecoration(
+          color: AppColors.neutral0,
+          borderRadius: BorderRadius.circular(Radii.card),
+          boxShadow: const [
+            BoxShadow(
+                color: Colors.black12, blurRadius: 12, offset: Offset(0, 6)),
+          ],
+        ),
+        padding: const EdgeInsets.all(Spacing.md),
+        child: Align(
+          alignment: Alignment.bottomLeft,
+          child: Text(name, style: Theme.of(context).textTheme.titleSmall),
+        ),
       ),
     );
   }

@@ -3,6 +3,7 @@ import 'package:postgrest/postgrest.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../../src/core/network/supabase_client_provider.dart';
+import '../../domain/entities/budget.dart';
 import '../../domain/value_objects/budget_request.dart';
 import '../dtos/budget_category_dto.dart';
 import '../dtos/budget_dto.dart';

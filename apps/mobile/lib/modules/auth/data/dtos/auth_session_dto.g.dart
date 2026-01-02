@@ -20,5 +20,5 @@ Map<String, dynamic> _$$AuthSessionDtoImplToJson(
       'accessToken': instance.accessToken,
       'refreshToken': instance.refreshToken,
       'expiresAt': instance.expiresAt.toIso8601String(),
-      'user': instance.user,
+      'user': instance.user.toJson(),
     };

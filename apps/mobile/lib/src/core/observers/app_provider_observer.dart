@@ -17,10 +17,17 @@ class AppProviderObserver extends ProviderObserver {
   }
 
   @override
-  void handleError(
-      ProviderBase<Object?> provider, Object error, StackTrace stackTrace) {
-    _reporter.record(error, stackTrace,
-        hint: 'Provider ${provider.name ?? provider.runtimeType} error');
-    super.handleError(provider, error, stackTrace);
+  void providerDidFail(
+    ProviderBase<Object?> provider,
+    Object error,
+    StackTrace stackTrace,
+    ProviderContainer container,
+  ) {
+    _reporter.record(
+      error,
+      stackTrace,
+      context: 'Provider ${provider.name ?? provider.runtimeType} error',
+    );
+    super.providerDidFail(provider, error, stackTrace, container);
   }
 }

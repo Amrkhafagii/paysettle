@@ -16,8 +16,8 @@ class AppConfig {
 
   factory AppConfig.dev() => AppConfig(
         flavor: Flavor.dev,
-        supabaseUrl: 'https://dev-placeholder.supabase.co',
-        supabaseAnonKey: 'public-anon-key-dev',
+        supabaseUrl: 'https://jzfhytosexjlurjhltkn.supabase.co',
+        supabaseAnonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp6Zmh5dG9zZXhqbHVyamhsdGtuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcxOTgxMTMsImV4cCI6MjA4Mjc3NDExM30.N_MZqND2Aa51HEKFBK8GXtlLMJAywYHEOf3WmFFaQR8',
         enableLogging: true,
         initialRoute: '/onboarding',
         restBaseUrl: 'https://api.dev.paysettle.local',
@@ -44,7 +44,6 @@ class AppConfig {
         restBaseUrl: 'https://api.paysettle.com',
         sentryDsn: '',
       );
-
   final Flavor flavor;
   final String supabaseUrl;
   final String supabaseAnonKey;

@@ -9,6 +9,7 @@ part 'auth_session_dto.g.dart';
 
 @freezed
 class AuthSessionDto with _$AuthSessionDto {
+  @JsonSerializable(explicitToJson: true)
   const factory AuthSessionDto({
     required String accessToken,
     required String refreshToken,

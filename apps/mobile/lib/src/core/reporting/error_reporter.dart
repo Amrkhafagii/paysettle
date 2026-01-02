@@ -10,12 +10,18 @@ class ErrorReporter {
   Future<void> record(
     Object error,
     StackTrace? stackTrace, {
-    String? hint,
+    String? context,
   }) async {
-    _logger.severe(hint ?? 'Unhandled exception', error, stackTrace);
+    _logger.severe(context ?? 'Unhandled exception', error, stackTrace);
 
     if (Sentry.isEnabled) {
-      await Sentry.captureException(error, stackTrace: stackTrace, hint: hint);
+      final sentryHint =
+          context == null ? null : Hint.withMap({'context': context});
+      await Sentry.captureException(
+        error,
+        stackTrace: stackTrace,
+        hint: sentryHint,
+      );
     }
   }
 }

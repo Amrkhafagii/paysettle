@@ -9,13 +9,16 @@ import 'tokens.dart';
 
 final themeModeProvider = StateProvider<ThemeMode>((ref) => ThemeMode.light);
 
-final lightThemeProvider =
-    Provider<ThemeData>((ref) => _buildTheme(Brightness.light, ref));
-final darkThemeProvider =
-    Provider<ThemeData>((ref) => _buildTheme(Brightness.dark, ref));
-
-ThemeData _buildTheme(Brightness brightness, WidgetRef ref) {
+final lightThemeProvider = Provider<ThemeData>((ref) {
   final override = ref.watch(themeOverrideProvider);
+  return _buildTheme(Brightness.light, override);
+});
+final darkThemeProvider = Provider<ThemeData>((ref) {
+  final override = ref.watch(themeOverrideProvider);
+  return _buildTheme(Brightness.dark, override);
+});
+
+ThemeData _buildTheme(Brightness brightness, ThemeOverride? override) {
   final ThemePalette? palette =
       brightness == Brightness.dark ? override?.dark : override?.light;
   final resolvedRadius = override?.cornerRadius ?? Radii.card;

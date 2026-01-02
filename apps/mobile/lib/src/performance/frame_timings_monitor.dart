@@ -53,7 +53,7 @@ class FrameTimingsMonitor {
   Timer? _submitTimer;
   bool _isRunning = false;
   DateTime _startedAt = DateTime.now().toUtc();
-  FrameMetrics _latest = const FrameMetrics(
+  FrameMetrics _latest = FrameMetrics(
     totalFrames: 0,
     droppedFrames: 0,
     averageFrameMs: 0,
